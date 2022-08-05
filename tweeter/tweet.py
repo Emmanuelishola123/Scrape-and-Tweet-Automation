@@ -19,11 +19,11 @@ client = tweepy.Client(
 
 
 # The app and the corresponding credentials must have the Write permission
-def tweet(title, description, url):
-    intro = '📢---New video spotted---📢'
+def tweet(intro, title, description, url):
+  
     desc = format_description_text(description)
 
-    text = f"{intro}\n\n📺{title}\n\n\"{desc}\"\n\n Source:\n{url}"
+    text = f"{intro}\n\n📺{title}\n\n\"{desc}\"\n\nSource:\n{url}"
     print(text)
     print(len(text))
     response = client.create_tweet(

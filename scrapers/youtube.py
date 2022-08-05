@@ -41,16 +41,13 @@ def scrape_youtube():
     
     time.sleep(5)
 
+    intro = '📢---New video spotted---📢'
     desc = WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.XPATH, "//span[@class='style-scope yt-formatted-string']"))).text
     url = driver.current_url
 
-    # print(title)
-    # print(desc)
-    # print(len(desc))
-    # print(url)
 
     # UPLOAD TO TWITTER
-    tweet(title, desc, url)
+    tweet(intro, title, desc, url)
     
     time.sleep(5)
     driver.quit()

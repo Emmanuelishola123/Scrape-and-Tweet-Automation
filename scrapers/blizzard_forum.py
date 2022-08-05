@@ -15,6 +15,12 @@ driver = webdriver.Chrome(PATH)
 
 
 
-def blizzard_news_scrapper():
+def blizzard_forum_scrapper():
     driver.implicitly_wait(10)
     driver.get('https://us.forums.blizzard.com/en/hearthstone/g/blizzard-tracker/activity/topics')
+
+
+    a = WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.XPATH, "//a[@class='title raw-link raw-topic-link']"))).click() 
+    
+
+blizzard_forum_scrapper()
