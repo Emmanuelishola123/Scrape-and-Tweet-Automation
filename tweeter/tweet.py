@@ -1,14 +1,14 @@
+import os
 import tweepy
+from dotenv import load_dotenv
 
-from scrapers.setup import format_description_text
+load_dotenv()
 
-
-# Store Credentials
-consumer_key = 'peerwaI29wPMr8ahRh7kANhgK'
-consumer_secret = 'q95DpQNXsj2gsa6t2a6FaJMUtJ9X6DzOBWpkbBBngdr5X1qlq7'
-
-access_token = '1549187609523519489-6Mdu9bZeYE61MJsOEryBy5HVY6HtPU'
-access_token_secret = '0XJg483kFOhWpxDbJBWcAjI504EJP30SfBBSWQQE0sXva'
+# TWITTER API CREDENTIALS 
+consumer_key = os.environ.get("CONSUMER_KEY")
+consumer_secret = os.environ.get("CONSUMER_SECRET")
+access_token = os.environ.get("ACCESS_TOKEN")
+access_token_secret = os.environ.get("ACCESS_TOKEN_SECRET")
 
 
 client = tweepy.Client(
@@ -17,19 +17,11 @@ client = tweepy.Client(
 )
 
 
-
 # The app and the corresponding credentials must have the Write permission
-def tweet(intro, title, description, url):
-  
-    desc = format_description_text(description)
-
-    text = f"{intro}\n\n📺{title}\n\n\"{desc}\"\n\nSource:\n{url}"
-    print(text)
-    print(len(text))
+def tweet(tweet):
     response = client.create_tweet(
-        text = f"{intro}\n\n📺{title}\n\n\"{desc}\"\n\nSource:\n{url}"
+        text = tweet
     )
     print(f"https://twitter.com/user/status/{response.data['id']}")
-
 
 

@@ -1,53 +1,62 @@
 # IMPORT NECCESSARY LIB
+import os
 import time
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from scrapers.setup import format_description_text
 from tweeter.tweet import tweet
 
 
-# PATH TO CHROMEDRIVER
-PATH = "C:\Program Files (x86)\chromedriver.exe"
-driver = webdriver.Chrome(PATH)
 trigger_Words = ['Trailer', 'Chat', 'Reveal', 'Announcement', 'Overview', 'Teaser', 'Adventure', 'Year', 'Update', 'Hearthside']
+c_path = os.getcwd()
 
-
-def scrape_youtube():
+def scrape_youtube(driver, WebDriverWait, By, EC):
     latest_video = None
-    # title = ''
-    # desc = ''
-    # url = ''
+    tweeted = False
     driver.implicitly_wait(10)
     driver.get('https://www.youtube.com/c/Hearthstone/videos')
 
-    time.sleep(4)
-    videos = driver.find_elements(By.XPATH, "//a[@id='video-title' and @class='yt-simple-endpoint style-scope ytd-grid-video-renderer']")
+    videos = WebDriverWait(driver, 30).until(EC.visibility_of_all_elements_located((By.XPATH, "//a[@id='video-title' and @class='yt-simple-endpoint style-scope ytd-grid-video-renderer']")))
     time.sleep(0.5)
 
-    for i in videos:
+    for video in videos:
         if latest_video != None:
             break
-        title = i.get_attribute('title')
+        with open(c_path +"/data/data.txt") as f:
+            for line in f:
+                if line.strip() == video.get_attribute('href'):
+                    tweeted = True
+                    
+        if tweeted:
+            break
+        title = video.get_attribute('title')
         print(title)
         for word in trigger_Words:
             if word in title:
-                latest_video = i
+                with open(c_path +"/data/data.txt", "a") as file:
+                    file.write(video.get_attribute('href') + '\n')
+                latest_video = video
                 print(word)
                 break
 
-    latest_video.click()
-    
-    time.sleep(5)
+    if latest_video == None:
+        return print('No Latest video......')
+    else:
+        latest_video.click()
+        
+        time.sleep(5)
 
-    intro = '📢---New video spotted---📢'
-    desc = WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.XPATH, "//span[@class='style-scope yt-formatted-string']"))).text
-    url = driver.current_url
+        intro = '📢--- New video spotted ---📢'
+        description = WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.XPATH, "//span[@class='style-scope yt-formatted-string']"))).text
+        url = driver.current_url
+        desc = format_description_text(description)
 
+        text = f"{intro}\n\n📺{title}\n\n\"{desc}\"\n\nSource: {url}"
 
-    # UPLOAD TO TWITTER
-    tweet(intro, title, desc, url)
-    
-    time.sleep(5)
-    driver.quit()
+        print('Youtube age...........................#####################################################')
+        print(text)
+
+        # UPLOAD TO TWITTER
+        tweet(text)
+        
+        time.sleep(5)
+        driver.quit()
+
