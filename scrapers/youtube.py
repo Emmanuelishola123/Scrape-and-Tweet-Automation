@@ -5,6 +5,7 @@ from scrapers.setup import format_description_text
 from tweeter.tweet import tweet
 
 
+
 trigger_Words = ['Trailer', 'Chat', 'Reveal', 'Announcement', 'Overview', 'Teaser', 'Adventure', 'Year', 'Update', 'Hearthside']
 c_path = os.getcwd()
 

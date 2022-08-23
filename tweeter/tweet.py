@@ -1,27 +1,45 @@
 import os
+import requests
 import tweepy
 from dotenv import load_dotenv
 
 load_dotenv()
 
 # TWITTER API CREDENTIALS 
-consumer_key = os.environ.get("CONSUMER_KEY")
-consumer_secret = os.environ.get("CONSUMER_SECRET")
-access_token = os.environ.get("ACCESS_TOKEN")
-access_token_secret = os.environ.get("ACCESS_TOKEN_SECRET")
+consumerKey = os.environ.get("CONSUMER_KEY")
+consumerSecret = os.environ.get("CONSUMER_SECRET")
+accessToken = os.environ.get("ACCESS_TOKEN")
+accessTokenSecret = os.environ.get("ACCESS_TOKEN_SECRET")
 
 
-client = tweepy.Client(
-    consumer_key=consumer_key, consumer_secret=consumer_secret,
-    access_token=access_token, access_token_secret=access_token_secret
+auth = tweepy.OAuth1UserHandler(
+    consumerKey,
+    consumerSecret,
+    accessToken,
+    accessTokenSecret
 )
-
+client = tweepy.API(auth)
 
 # The app and the corresponding credentials must have the Write permission
-def tweet(tweet):
-    response = client.create_tweet(
-        text = tweet
-    )
-    print(f"https://twitter.com/user/status/{response.data['id']}")
+def tweet(tweet, media = None):
+    if media == None:
+        response = client.update_status(
+            text = tweet
+        )
+        print(f"https://twitter.com/user/status/{response.data['id']}")
+    else:
+        tweet_image(media, tweet)
 
+def tweet_image(url, message):
+    file = 'temp.jpg'
+    request = requests.get(url, stream=True)
+    if request.status_code == 200:
+        with open(file, 'wb') as image:
+            for chunk in request:
+                image.write(chunk)
 
+        media_file = client.media_upload(filename = file)
+        response = client.update_status(status = message, media_ids = [media_file.media_id_string])
+        os.remove(file)
+    else:
+        print("Unable to download image")

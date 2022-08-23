@@ -1,14 +1,13 @@
 # IMPORT NECCESSARY LIB
+import os
 import time
 from scrapers.setup import format_description_text
-# from selenium import webdriver
-# from selenium.webdriver.common.keys import Keys
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
+
 from tweeter.tweet import tweet
 
 
+path = os.getcwd()
+default_media = path + '/blizzard.png'
 
 
 
@@ -24,21 +23,56 @@ def blizzard_news_scrapper(driver, WebDriverWait, By, EC):
     driver.implicitly_wait(10)
     driver.get('https://playhearthstone.com/en-gb/news')
 
-    WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a.Article-Link"))).click()
-    title = WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.XPATH, "//h2[@class='heading--small heading--article']/span"))).text
-    description = driver.find_element(By.XPATH, "//div[@class='detail blog-detail']/p").text
-    intro = '📢---Forum news spotted---📢'
-    url = driver.current_url
-    desc = format_description_text(description)
+    url = None 
+
+    all_news_links = WebDriverWait(driver, 30).until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "a.Article-Link")))
+
+    for new_url in all_news_links:
+        tweeted = False
+        with open(path +"/data/tweeted_news.txt") as f:
+            for line in f:
+                if line.strip() == new_url.get_attribute('href'):
+                    tweeted = True
+                    break
+        if tweeted:
+            continue  
+        else: 
+            with open(path +"/data/tweeted_news.txt", 'a') as f:
+                f.write(new_url.get_attribute('href') + '\n')
+                url = new_url.get_attribute('href')
+            break
+
+    if url == None:
+        print('No new card available at the moment')        
+    else:
+        scrape_news(driver, WebDriverWait, By, EC, url)
+        driver.quit()
+        print('done..............')    
+   
+  
+
+
+def scrape_news(driver, WebDriverWait, By, EC, url_link):
+    driver.get(url_link)
+    time.sleep(10)
+    title = WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "h2.heading--article span"))).text
+    description = driver.find_element(By.CSS_SELECTOR, "div.detail.blog-detail p").text
+    img = driver.find_element(By.CSS_SELECTOR, "div.header-image img")
+    img_href = img.get_attribute('src')
+    intro = '📢---News Article Spotted---📢'
+    url = driver.current_url 
+    t = f"{intro}\n\n📜{title}\n\nSource: {url}"
+    desc = format_description_text(description, len(t))
 
     text = f"{intro}\n\n📜{title}\n\n\"{desc}\"\n\nSource: {url}"
 
     print('Blizzard News...........................#####################################################')
-    print(text)
+    print(text, img_href)
 
     # UPLOAD TO TWITTER
-    tweet(text)
+    tweet(text, media = img_href)
     
     time.sleep(5)
-    driver.quit()
+    driver.quit() 
+   
 

@@ -1,4 +1,5 @@
 # IMPORT NECCESSARY LIB
+import os
 import time
 from scrapers.setup import format_description_text
 # from selenium import webdriver
@@ -9,6 +10,8 @@ from scrapers.setup import format_description_text
 
 from tweeter.tweet import tweet
 
+path = os.getcwd()
+default_media = 'https://pbs.twimg.com/media/Fab5GYZXoAYIuYn?format=png&name=small'
 
 # PATH TO CHROMEDRIVER
 # PATH = "C:\Program Files (x86)\chromedriver.exe"
@@ -21,23 +24,47 @@ def blizzard_forum_scrapper(driver, WebDriverWait, By, EC):
     driver.implicitly_wait(10)
     driver.get('https://us.forums.blizzard.com/en/hearthstone/g/blizzard-tracker/activity/topics')
 
-    WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, "//a[@class='title raw-link raw-topic-link']"))).click()
-    WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, "//a[@class='widget-link now-date']"))).click()
+    url = None 
 
-    latest = WebDriverWait(driver, 30).until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@class='cooked']")))[-1]
-    issue = latest.find_element(By.TAG_NAME, "p").text
+    all_bliss_articles = WebDriverWait(driver, 20).until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "a.tracked-post.group-community-manager")))
+    top_ten_articles = all_bliss_articles[:10] 
+
+    for new_url in top_ten_articles:
+        tweeted = False
+        with open(path +"/data/tweeted_articles.txt") as f:
+            for line in f:
+                if line.strip() == new_url.get_attribute('href'):
+                    tweeted = True
+                    break
+        if tweeted:
+            continue  
+        else: 
+            with open(path +"/data/tweeted_articles.txt", 'a') as f:
+                f.write(new_url.get_attribute('href') + '\n')
+                url = new_url.get_attribute('href')
+            break
+
+    if url == None:
+        print('No new articles available at the moment')        
+    else:
+        scrape_articles(driver, WebDriverWait, By, EC, url)
+        driver.quit()
+        print('done..............')    
+
+
+def scrape_articles(driver, WebDriverWait, By, EC, url):
+    driver.get(url)
+    time.sleep(10)
+    title = driver.find_element(By.CSS_SELECTOR, "a.fancy-title").text
 
     intro = '📢---Forum known issues update spotted---📢'
     url = driver.current_url
-    p_text = format_description_text(issue)
+   
+    text = f"{intro}\n\n📺 {title}\n\nSource: {url}"
 
-    text = f"{intro}\n\n📺{p_text}\n\nSource: {url}"
-
-    print('Blizzard Forum...........................#####################################################')
-    print(text)
-
+   
     # UPLOAD TO TWITTER
-    tweet(text)
+    tweet(text, media = default_media)
     
     time.sleep(5)
     driver.quit()
