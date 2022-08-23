@@ -30,24 +30,24 @@ while True:
     scrape_youtube(driver, WebDriverWait, By, EC)
 
     # Sleep for 5mins then continue
-    time.sleep( 10)
+    # time.sleep( 10)
 
 
-    print('Scraping blizzard forum site...........................')
-    blizzard_forum_scrapper(driver, WebDriverWait, By, EC)
-
-    # Sleep for 5mins then continue
-    time.sleep(10)
-
-
-    print('Scraping blizzard news site...........................')
-    blizzard_news_scrapper(driver, WebDriverWait, By, EC)
+    # print('Scraping blizzard forum site...........................')
+    # blizzard_forum_scrapper(driver, WebDriverWait, By, EC)
 
     # Sleep for 5mins then continue
-    time.sleep(10)
+    # time.sleep(10)
 
-    print('Scraping shop.battle.net...........................')
-    battle_shop_scrapper(driver, WebDriverWait, By, EC)
+
+    # print('Scraping blizzard news site...........................')
+    # blizzard_news_scrapper(driver, WebDriverWait, By, EC)
+
+    # Sleep for 5mins then continue
+    # time.sleep(10)
+
+    # print('Scraping shop.battle.net...........................')
+    # battle_shop_scrapper(driver, WebDriverWait, By, EC)
 
     # Sleep for 1 hour then continue
     time.sleep(60 * 60)
