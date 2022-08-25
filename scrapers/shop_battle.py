@@ -62,10 +62,6 @@ def scrape_card_info(driver, By, url, i):
     bg_img = driver.find_element(By.CSS_SELECTOR, "div.mobile").value_of_css_property("background-image").split('"')[1]
     header_info = driver.find_element(By.CSS_SELECTOR, "div.product-heading")
     topic_1 = driver.find_element(By.CSS_SELECTOR, "h1.meka-font-display--header-4 > span").text
-    # topic_2 = header_info.find_element(By.CSS_SELECTOR, "h3.meka-font-display--header-2").text
-    # availability = None
-    # description = None
-    # price = None
     time.sleep(0.5)
 
     # Check Description

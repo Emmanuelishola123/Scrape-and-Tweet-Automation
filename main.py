@@ -50,5 +50,5 @@ while True:
     # battle_shop_scrapper(driver, WebDriverWait, By, EC)
 
     # Sleep for 1 hour then continue
-    time.sleep(60 * 60)
+    time.sleep(60)
 

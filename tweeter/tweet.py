@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# file = os.getcwd() + "/blizzard.png"
+
 # TWITTER API CREDENTIALS 
 consumerKey = os.environ.get("CONSUMER_KEY")
 consumerSecret = os.environ.get("CONSUMER_SECRET")

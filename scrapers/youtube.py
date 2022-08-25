@@ -56,7 +56,7 @@ def scrape_youtube(driver, WebDriverWait, By, EC):
         print(text)
 
         # UPLOAD TO TWITTER
-        tweet(text)
+        tweet(text , media= None)
         
         time.sleep(5)
         driver.quit()
